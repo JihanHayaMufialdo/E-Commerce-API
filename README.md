@@ -1,14 +1,15 @@
 🛒 E-Commerce Backend  
+  
 This is the backend for an E-Commerce application, built with:  
-Node.js – Runtime JavaScript  
-Express – Web framework  
-Prisma – ORM for PostgreSQL  
-PostgreSQL – Relational database  
-GitHub – Version control & repository  
++ Node.js – Runtime JavaScript  
++ Express – Web framework  
++ Prisma – ORM for PostgreSQL  
++ PostgreSQL – Relational database  
++ GitHub – Version control & repository  
 
 🚀 Installation  
 1. Clone the repository  
-   git clone https://github.com/your-username/ecommerce-backend.git  
+   git clone https://github.com/JihanHayaMufialdo/E-Commerce-API.git
    cd ecommerce-backend  
 2. Install dependencies  
    npm install  
