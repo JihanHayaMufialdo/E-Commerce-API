@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -14,12 +13,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
 model User {
-  id           Int     @id @default(autoincrement())
+  id           Int    @id @default(autoincrement())
   userName     String
-  userEmail    String  @unique
+  userEmail    String @unique
   userPassword String
-  userRole     String
+  userRole     Role   @default(USER)
   // orders       Order[]
 
   createdAt DateTime @default(now())
@@ -41,5 +44,3 @@ model User {
 
 //   @@map(name: "products")
 // }
-
-  
