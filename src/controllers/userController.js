@@ -10,6 +10,7 @@ const getUsers = async (req, res) => {
         userEmail: true,
         userRole: true,
         createdAt: true,
+        updatedAt: true
       },
     });
     res.json(users);
