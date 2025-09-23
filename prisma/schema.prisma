@@ -27,7 +27,7 @@ enum OrderStatus {
 }
 
 model User {
-  id           Int     @id @default(autoincrement())
+  id           String     @id @default(uuid())
   userName     String
   userEmail    String  @unique
   userPassword String
@@ -47,18 +47,17 @@ model Product {
   productPrice Int
   productStock Int
   cartItems    CartItem[]
-  // orderItems   OrderItem[]
+  orderItems   OrderItem[]
 
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
-  OrderItem OrderItem[]
 
   @@map(name: "products")
 }
 
 model Cart {
   id        Int        @id @default(autoincrement())
-  userId    Int
+  userId    String
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   cartItems CartItem[]
 
@@ -81,7 +80,7 @@ model Order {
   orderDate   DateTime
   orderAmount Int
   orderStatus OrderStatus @default(PENDING)
-  userId      Int
+  userId      String
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   orderItems  OrderItem[]
   payments    Payment[]

@@ -7,7 +7,7 @@ const getCart = async (req, res) => {
     const userId = req.user.id;
     let cart = await prisma.cart.findFirst({
       where: { userId },
-      include: {
+      select: {
         cartItems: {
           select: {
             id: true,

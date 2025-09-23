@@ -19,7 +19,7 @@ async function main() {
     }
   });
 
-  await prisma.user.upsert({
+  const user1 = await prisma.user.upsert({
     where: { userEmail: "user@shop.com" },
     update: {},
     create: {
@@ -30,7 +30,7 @@ async function main() {
     }
   });
 
-  await prisma.user.upsert({
+  const user2 = await prisma.user.upsert({
     where: { userEmail: "user2@shop.com" },
     update: {},
     create: {
@@ -75,10 +75,10 @@ async function main() {
   await prisma.cart.createMany({
     data: [
       {
-        userId: 2,
+        userId: user1.id,
       },
       {
-        userId: 3,
+        userId: user2.id,
       },
     ],
   });
@@ -118,7 +118,7 @@ async function main() {
       orderDate: new Date(),
       orderAmount: 2000,
       orderStatus: "PENDING",
-      userId: 2,
+      userId: user1.id,
       orderItems: {
         create: [
           { productId: 1, orderItemQuantity: 3 },
@@ -134,7 +134,7 @@ async function main() {
       orderDate: new Date(),
       orderAmount: 3000,
       orderStatus: "PENDING",
-      userId: 3,
+      userId: user2.id,
       orderItems: {
         create: [
           { productId: 3, orderItemQuantity: 1 },

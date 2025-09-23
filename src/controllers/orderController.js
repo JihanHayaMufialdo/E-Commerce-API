@@ -11,17 +11,20 @@ const getOrders = async (req, res) => {
           userId,
           NOT: { orderStatus: "CANCELLED" }
         },
-        include: {
-          orderItems: { 
-            select: { 
+        select: {
+          orderDate: true,
+          orderAmount: true,
+          orderStatus: true,
+          orderItems: {
+            select: {
                 product: {
-                    select: {
-                        productName: true,
-                        productPrice: true,
-                    }
+                  select: {
+                    productName: true,
+                    productPrice: true,
+                  }
                 },
                 orderItemQuantity: true
-            } 
+            }
           },
         }
       });
@@ -50,19 +53,22 @@ const getHistoryOrders = async (req, res) => {
             { orderStatus: "DELIVERED" },
           ]
         },
-        include: {
-            orderItems: { 
-              select: { 
-                  product: {
-                      select: {
-                          productName: true,
-                          productPrice: true,
-                      }
-                  },
-                  orderItemQuantity: true
-              } 
-            },
-          }
+        select: {
+          orderDate: true,
+          orderAmount: true,
+          orderStatus: true,
+          orderItems: {
+            select: {
+                product: {
+                  select: {
+                    productName: true,
+                    productPrice: true,
+                  }
+                },
+                orderItemQuantity: true
+            }
+          },
+        }
       });
   
       const formatted = cancelledOrders.map(o => ({
@@ -74,7 +80,7 @@ const getHistoryOrders = async (req, res) => {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  };
+};
 
 // Create order (update product stock)
 const createOrder = async (req, res) => {
@@ -140,27 +146,63 @@ const createOrder = async (req, res) => {
 };
 
 // Update order status
-const updateOrder = async (req, res) => {
+const updateOrderStatus = async (req, res) => {
   const { id } = req.params;
   const { orderStatus } = req.body;
 
   try {
-    const updated = await prisma.order.update({
-      where: { id: Number(id) },
-      data: {
-        orderStatus,
-      }
+    const order = await prisma.order.findUnique({
+      where: id,
     });
-    res.json(updated);  
-    } catch (error) {
-        if (error instanceof Prisma.PrismaClientValidationError) {
-        return res.status(400).json({
-            error: "Invalid value for orderStatus. Allowed values: PENDING, PAID, SHIPPED, DELIVERED, CANCELLED"
-        });
-        }
-        res.status(500).json({ error: error.message });
+
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
     }
+
+    const currentStatus = order.orderStatus;
+
+    // Prevent invalid transitions
+    let allowed = false;
+
+    if (currentStatus === "SHIPPED" && orderStatus === "DELIVERED") {
+      allowed = true;
+    }
+
+    if (currentStatus === "PENDING" && orderStatus === "CANCELLED") {
+      allowed = true;
+    }
+
+    // pending → paid is automatic via payment, so block here
+    if (orderStatus === "PAID") {
+      return res.status(400).json({
+        error: "Order cannot be updated to PAID manually. Please create a payment record."
+      });
+    }
+
+    if (!allowed) {
+      return res.status(403).json({
+        error: `Transition from ${currentStatus} to ${orderStatus} not allowed for User`
+      });
+    }
+
+    // Do the update
+    const updated = await prisma.order.update({
+      where: id,
+      data: { orderStatus },
+    });
+
+    res.json(updated);
+
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientValidationError) {
+      return res.status(400).json({
+        error: "Invalid value for orderStatus. Allowed values: DELIVERED, CANCELLED"
+      });
+    }
+    res.status(500).json({ error: error.message });
+  }
 };
+
 
 // Cancel Order
 const cancelOrder = async (req, res) => {
@@ -194,5 +236,5 @@ const cancelOrder = async (req, res) => {
     }
 };
 
-module.exports = { getOrders, getHistoryOrders, createOrder, updateOrder, cancelOrder };
+module.exports = { getOrders, getHistoryOrders, createOrder, updateOrderStatus, cancelOrder };
 

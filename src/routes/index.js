@@ -1,28 +1,14 @@
 const express = require("express");
-const { register, login } = require("../controllers/authController");
-const { getUsers } = require("../controllers/userController");
-const {
-  createProduct,
-  updateProduct,
-  deleteProduct,
-  getProducts
-} = require("../controllers/productController");
-const {
-  getCart,
-  addCartItem,
-  updateCartItem,
-  deleteCartItem,
-} = require ("../controllers/cartController.js");
-const {
-  getOrders,
-  getHistoryOrders,
-  createOrder,
-  updateOrder,
-  cancelOrder
-} = require("../controllers/orderController.js");
-const { createPayment } = require("../controllers/paymentController");
 
 const authMiddleware = require("../middleware/auth");
+const { register, login } = require("../controllers/authController");
+const { getAllProducts} = require("../controllers/productController");
+const { getCart, addCartItem, updateCartItem, deleteCartItem} = require ("../controllers/cartController.js");
+const { getOrders, getHistoryOrders, createOrder, cancelOrder, updateOrderStatus} = require("../controllers/orderController.js");
+const { createPayment } = require("../controllers/paymentController");
+const { getAllOrders, getUserOrders, getUserOrderItems, updateUserOrderStatus } = require("../controllers/admin/orderController.js");
+const { getUsers } = require("../controllers/admin/userController.js");
+const { createProduct, updateProduct, deleteProduct, getProducts } = require("../controllers/admin/productController.js");
 
 const router = express.Router();
 
@@ -33,13 +19,20 @@ router.get("/", (req, res) => {
 router.post("/register", register);
 router.post("/login", login);
 
-router.get("/users",  authMiddleware(["ADMIN"]), getUsers);
+// Admin Route
+router.get("/admin/users",  authMiddleware(["ADMIN"]), getUsers);
+router.get("/admin/orders", authMiddleware(["ADMIN"]), getAllOrders)
+router.get("/admin/users/:userId/orders", authMiddleware(["ADMIN"]), getUserOrders)
+router.get("/admin/users/:userId/orders/:orderId", authMiddleware(["ADMIN"]), getUserOrderItems)
+router.put("/admin/users/:userId/orders/:orderId/status", authMiddleware(["ADMIN"]), updateUserOrderStatus)
 
-// Products (only ADMIN can create, update, delete)
-router.get("/products", getProducts);
-router.post("/products", authMiddleware(["ADMIN"]), createProduct);
-router.put("/products/:id", authMiddleware(["ADMIN"]), updateProduct);
-router.delete("/products/:id", authMiddleware(["ADMIN"]), deleteProduct);
+router.get("/admin/products", authMiddleware(["ADMIN"]), getProducts);
+router.post("/admin/products", authMiddleware(["ADMIN"]), createProduct);
+router.put("/admin/products/:id", authMiddleware(["ADMIN"]), updateProduct);
+router.delete("/admin/products/:id", authMiddleware(["ADMIN"]), deleteProduct);
+
+// Products
+router.get("/products", getAllProducts);
 
 // Cart
 router.get("/cart", authMiddleware(["USER"]), getCart);
@@ -51,7 +44,7 @@ router.delete("/cart/items/:id", authMiddleware(["USER"]), deleteCartItem);
 router.get("/orders", authMiddleware(["USER"]), getOrders);
 router.get("/orders/history", authMiddleware(["USER"]), getHistoryOrders);
 router.post("/orders", authMiddleware(["USER"]), createOrder);
-router.put("/orders/:id", authMiddleware(["ADMIN"]), updateOrder);
+router.put("/orders/:id", authMiddleware(["ADMIN"]), updateOrderStatus);
 router.delete("/orders/:id", authMiddleware(["USER"]), cancelOrder);
 
 // Payment
