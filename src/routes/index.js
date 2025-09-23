@@ -20,6 +20,8 @@ const {
   updateOrder,
   cancelOrder
 } = require("../controllers/orderController.js");
+const { createPayment } = require("../controllers/paymentController");
+
 const authMiddleware = require("../middleware/auth");
 
 const router = express.Router();
@@ -51,6 +53,10 @@ router.get("/orders/history", authMiddleware(["USER"]), getHistoryOrders);
 router.post("/orders", authMiddleware(["USER"]), createOrder);
 router.put("/orders/:id", authMiddleware(["ADMIN"]), updateOrder);
 router.delete("/orders/:id", authMiddleware(["USER"]), cancelOrder);
+
+// Payment
+router.post("/orders/:id/payment", authMiddleware(["USER"]), createPayment);
+
 
 router.get("/protected", authMiddleware(["ADMIN"]), (req, res) => {
   res.json({ message: "Welcome Admin!", user: req.user });
