@@ -9,7 +9,10 @@ const getOrders = async (req, res) => {
       const orders = await prisma.order.findMany({
         where: {
           userId,
-          NOT: { orderStatus: "CANCELLED" }
+          NOT: [ 
+            { orderStatus: "CANCELLED"},
+            { orderStatus: "DELIVERED"} 
+          ]
         },
         select: {
           orderDate: true,
@@ -85,7 +88,7 @@ const getHistoryOrders = async (req, res) => {
 // Create order (update product stock)
 const createOrder = async (req, res) => {
   const userId = req.user.id;
-  const { orderStatus, orderItems } = req.body;
+  const { orderItems } = req.body;
 
   try {
     let orderAmount = 0;
@@ -113,7 +116,6 @@ const createOrder = async (req, res) => {
           userId,
           orderDate: new Date(),
           orderAmount,
-          orderStatus,
           orderItems: {
             create: orderItems.map((item) => ({
               productId: item.productId,
@@ -148,55 +150,34 @@ const createOrder = async (req, res) => {
 // Update order status
 const updateOrderStatus = async (req, res) => {
   const { id } = req.params;
-  const { orderStatus } = req.body;
+  const userId = req.user.id;
 
   try {
-    const order = await prisma.order.findUnique({
-      where: id,
+    const order = await prisma.order.findFirst({
+      where: { userId, id: Number(id) },
     });
 
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
     }
-
-    const currentStatus = order.orderStatus;
-
-    // Prevent invalid transitions
-    let allowed = false;
-
-    if (currentStatus === "SHIPPED" && orderStatus === "DELIVERED") {
-      allowed = true;
+    if (order.orderStatus !== "SHIPPED") {
+      return res.status(400).json({ error: "Order can only marked as delivered if status is still shipped" });
     }
 
-    if (currentStatus === "PENDING" && orderStatus === "CANCELLED") {
-      allowed = true;
-    }
-
-    // pending → paid is automatic via payment, so block here
-    if (orderStatus === "PAID") {
-      return res.status(400).json({
-        error: "Order cannot be updated to PAID manually. Please create a payment record."
-      });
-    }
-
-    if (!allowed) {
-      return res.status(403).json({
-        error: `Transition from ${currentStatus} to ${orderStatus} not allowed for User`
-      });
-    }
-
-    // Do the update
-    const updated = await prisma.order.update({
-      where: id,
-      data: { orderStatus },
+    const receivedOrder = await prisma.order.update({
+      where: { id: Number(id) },
+      data: { orderStatus: "DELIVERED" }
     });
 
-    res.json(updated);
+    res.json({
+      message: "Order status updated",
+      receivedOrder
+    });
 
   } catch (error) {
     if (error instanceof Prisma.PrismaClientValidationError) {
       return res.status(400).json({
-        error: "Invalid value for orderStatus. Allowed values: DELIVERED, CANCELLED"
+        error: "Invalid value for orderStatus, Order cannot be cancelled"
       });
     }
     res.status(500).json({ error: error.message });
@@ -228,8 +209,8 @@ const cancelOrder = async (req, res) => {
       });
   
       res.json({
-        message: "Order has been successfully cancelled",
-        order: cancelledOrder
+        message: "Order cancelled",
+        cancelledOrder
       });
     } catch (error) {
       res.status(500).json({ error: error.message });

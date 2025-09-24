@@ -10,7 +10,6 @@ const getCart = async (req, res) => {
       select: {
         cartItems: {
           select: {
-            id: true,
             product: {
                 select: {
                     productName: true,

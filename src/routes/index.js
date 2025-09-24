@@ -44,8 +44,8 @@ router.delete("/cart/items/:id", authMiddleware(["USER"]), deleteCartItem);
 router.get("/orders", authMiddleware(["USER"]), getOrders);
 router.get("/orders/history", authMiddleware(["USER"]), getHistoryOrders);
 router.post("/orders", authMiddleware(["USER"]), createOrder);
-router.put("/orders/:id", authMiddleware(["ADMIN"]), updateOrderStatus);
-router.delete("/orders/:id", authMiddleware(["USER"]), cancelOrder);
+router.put("/orders/:id/status", authMiddleware(["ADMIN"]), updateOrderStatus);
+router.delete("/orders/:id/cancel", authMiddleware(["USER"]), cancelOrder);
 
 // Payment
 router.post("/orders/:id/payment", authMiddleware(["USER"]), createPayment);

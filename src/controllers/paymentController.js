@@ -46,8 +46,8 @@ const createPayment = async (req, res) => {
     });
 
     res.json({
-      message: "Payment created",
-      payment,
+      message: "Payment token created",
+      // payment,
       redirect_url: transaction.redirect_url,
       token: transaction.token
     });

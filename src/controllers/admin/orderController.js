@@ -37,8 +37,7 @@ const getUserOrders = async (req, res) => {
   
       const orders = await prisma.order.findMany({
         where: {
-          userId,
-          NOT: { orderStatus: "CANCELLED" }
+          userId
         },
         select: {
             orderDate: true,
@@ -97,7 +96,6 @@ const getUserOrderItems = async (req, res) => {
 // Update order status
 const updateUserOrderStatus = async (req, res) => {
     const { userId, orderId } = req.params;
-    const { orderStatus } = req.body;
   
     try {
       // Check if order belongs to the user
@@ -112,18 +110,8 @@ const updateUserOrderStatus = async (req, res) => {
         return res.status(404).json({ error: "Order not found" });
       }
   
-      const currentStatus = order.orderStatus;
-  
-      let allowed = false;
-  
-      if (currentStatus === "PAID" && orderStatus === "SHIPPED") {
-        allowed = true;
-      }
-  
-      if (!allowed) {
-        return res.status(403).json({
-          error: `Transition from ${currentStatus} to ${orderStatus} not allowed for Admin`
-        });
+      if (order.orderStatus !== "PAID") {
+        return res.status(400).json({ error: "Order can only SHIPPED if order status is PAID" });
       }
   
       const updated = await prisma.order.update({
@@ -131,11 +119,16 @@ const updateUserOrderStatus = async (req, res) => {
             id: orderId,
             userId: userId
         },
-        data: { orderStatus },
+        data: { orderStatus: "SHIPPED" },
       });
   
-      res.json(updated);
+      res.json({message: "Order status updated", updated});
     } catch (error) {
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        return res.status(400).json({
+          error: "Invalid value for orderStatus, Order cannot be cancelled"
+        });
+      }
       res.status(500).json({ error: error.message });
     }
 };  
