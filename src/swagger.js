@@ -9,7 +9,7 @@ const options = {
       description: "API documentation with Swagger",
     },
     servers: [
-      { url: "http://localhost:5000/api" },
+      { url: "/api" },
     ],
     components: {
       securitySchemes: {
@@ -109,7 +109,7 @@ const options = {
       },
     },
   },
-  apis: ["./src/routes/*.js"],
+  apis: ["./src/routes/**/*.js"]
 };
 
 const specs = swaggerJsdoc(options);

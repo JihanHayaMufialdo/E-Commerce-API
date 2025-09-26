@@ -14,7 +14,7 @@ const options = {
       `,
     },
     servers: [
-      { url: "http://localhost:5000/public" },
+      { url: "/public" },
     ],
     components: {
       securitySchemes: {
@@ -114,7 +114,7 @@ const options = {
       },
     },
   },
-  apis: ["./src/routes/public/*.js"],
+  apis: ["./src/routes/public/**/*.js"],
 };
 
 const specs = swaggerJsdoc(options);
