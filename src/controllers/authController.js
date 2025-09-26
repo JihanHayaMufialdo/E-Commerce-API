@@ -10,7 +10,7 @@ const register = async (req, res) => {
 
     const hashedUserPassword = await bcrypt.hash(userPassword, 10);
 
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
         userName,
         userEmail,
@@ -21,12 +21,9 @@ const register = async (req, res) => {
 
     res.json({ message: "User registered, please login"});
   } catch (err) {
-    // Handle unique constraint violation (email already exists)
     if (err.code === "P2002" && err.meta && err.meta.target.includes("userEmail")) {
       return res.status(400).json({ error: "Email already registered" });
     }
-
-    // Generic server error
     res.status(500).json({ error: err.message });
   }
 };

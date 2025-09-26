@@ -11,9 +11,10 @@ const createPayment = async (req, res) => {
 
   try {
     const { id } = req.params;
+    const userId = req.user.id;
 
     const order = await prisma.order.findUnique({
-        where: { id },
+        where: { id, userId },
         include: {
             user: true
           }

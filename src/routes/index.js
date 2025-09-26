@@ -18,6 +18,7 @@ router.get("/", (req, res) => {
 
 router.post("/register", register);
 router.post("/login", login);
+router.post("/admin/login", login);
 
 // Admin Route
 router.get("/admin/users",  authMiddleware(["ADMIN"]), getUsers);
@@ -44,7 +45,7 @@ router.delete("/cart/items/:id", authMiddleware(["USER"]), deleteCartItem);
 router.get("/orders", authMiddleware(["USER"]), getOrders);
 router.get("/orders/history", authMiddleware(["USER"]), getHistoryOrders);
 router.post("/orders", authMiddleware(["USER"]), createOrder);
-router.put("/orders/:id/status", authMiddleware(["ADMIN"]), updateOrderStatus);
+router.put("/orders/:id/status", authMiddleware(["ADMIN","USER"]), updateOrderStatus);
 router.delete("/orders/:id/cancel", authMiddleware(["USER"]), cancelOrder);
 
 // Payment

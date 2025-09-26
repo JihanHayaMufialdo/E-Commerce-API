@@ -1,7 +1,6 @@
 const { PrismaClient, Prisma } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// GET all active orders
 const getOrders = async (req, res) => {
     try {
       const userId = req.user.id;
@@ -15,6 +14,7 @@ const getOrders = async (req, res) => {
           ]
         },
         select: {
+          id: true,
           orderDate: true,
           orderAmount: true,
           orderStatus: true,
@@ -43,7 +43,6 @@ const getOrders = async (req, res) => {
     }
 };
 
-// Get cancelled orders (history)
 const getHistoryOrders = async (req, res) => {
     try {
       const userId = req.user.id;
@@ -57,6 +56,7 @@ const getHistoryOrders = async (req, res) => {
           ]
         },
         select: {
+          id: true,
           orderDate: true,
           orderAmount: true,
           orderStatus: true,
@@ -85,7 +85,6 @@ const getHistoryOrders = async (req, res) => {
     }
 };
 
-// Create order (update product stock)
 const createOrder = async (req, res) => {
   const userId = req.user.id;
   const { orderItems } = req.body;
@@ -93,7 +92,6 @@ const createOrder = async (req, res) => {
   try {
     let orderAmount = 0;
 
-    // Check stock & calculate total price
     for (const item of orderItems) {
       const product = await prisma.product.findFirst({
         where: { id: item.productId }
@@ -109,7 +107,6 @@ const createOrder = async (req, res) => {
       orderAmount += product.productPrice * item.orderItemQuantity;
     }
 
-    // Create order & update stock in a transaction
     const newOrder = await prisma.$transaction(async (tx) => {
       const order = await tx.order.create({
         data: {
@@ -128,7 +125,6 @@ const createOrder = async (req, res) => {
         }
       });
 
-      // Update product stock
       for (const item of orderItems) {
         await tx.product.update({
           where: { id: item.productId },
@@ -141,20 +137,19 @@ const createOrder = async (req, res) => {
       return order;
     });
 
-    res.status(201).json(newOrder);
+    res.status(201).json({message: "Order created", newOrder});
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Update order status
 const updateOrderStatus = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
 
   try {
     const order = await prisma.order.findFirst({
-      where: { userId, id: Number(id) },
+      where: { userId, id: String(id) },
     });
 
     if (!order) {
@@ -165,7 +160,7 @@ const updateOrderStatus = async (req, res) => {
     }
 
     const receivedOrder = await prisma.order.update({
-      where: { id: Number(id) },
+      where: { id: String(id) },
       data: { orderStatus: "DELIVERED" }
     });
 
@@ -184,15 +179,13 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-
-// Cancel Order
 const cancelOrder = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
   
     try {
       const order = await prisma.order.findFirst({
-        where: { userId, id: Number(id) },
+        where: { userId, id: String(id) },
         include: { orderItems: true }
       });
   
@@ -200,11 +193,11 @@ const cancelOrder = async (req, res) => {
         return res.status(404).json({ error: "Order not found" });
       }
       if (order.orderStatus !== "PENDING") {
-        return res.status(400).json({ error: "Order can only be cancelled if status is still pending" });
+        return res.status(400).json({ error: "Invalid value for orderStatus, Order cannot be cancelled" });
       }
 
       const cancelledOrder = await prisma.order.update({
-        where: { id: Number(id) },
+        where: { id: String(id) },
         data: { orderStatus: "CANCELLED" }
       });
   

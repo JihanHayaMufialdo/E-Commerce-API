@@ -4,12 +4,17 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "E-commerce API",
+      title: "E-commerce Mock API",
       version: "1.0.0",
-      description: "API documentation with Swagger",
+      description: `
+        This is a mock version of the E-Commerce API.  
+        - No real database operations are performed.  
+        - No actual authentication or payment gateway is connected.  
+        - All endpoints return fake/mock responses for testing and documentation only.  
+      `,
     },
     servers: [
-      { url: "http://localhost:5000/api" },
+      { url: "http://localhost:5000/public" },
     ],
     components: {
       securitySchemes: {
@@ -109,7 +114,7 @@ const options = {
       },
     },
   },
-  apis: ["./src/routes/*.js"],
+  apis: ["./src/routes/public/*.js"],
 };
 
 const specs = swaggerJsdoc(options);

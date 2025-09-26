@@ -3,16 +3,11 @@
  * /cart:
  *   get:
  *     summary: Get user's cart
- *     description: >
- *       Retrieve the current user's cart with all cart items.
- *       If the cart does not exist, a new one will be created automatically.  
- *       Requires a valid JWT token with USER role.
- *     tags: [Cart]
- *     security:
- *       - bearerAuth: []
+ *     description: Retrieve the current user's cart with all cart items.
+ *     tags: [Carts]
  *     responses:
  *       200:
- *         description: Successfully retrieved the cart
+ *         description: Request success
  *       500:
  *         description: Error fetching cart
  */
@@ -22,13 +17,8 @@
  * /cart/items:
  *   post:
  *     summary: Add item to cart
- *     description: >
- *       Add a product to the user's cart.  
- *       If the product already exists in the cart, its quantity will be incremented.  
- *       Requires a valid JWT token with USER role.
- *     tags: [Cart]
- *     security:
- *       - bearerAuth: []
+ *     description: Add a product to the user's cart. If the product already exists in the cart, its quantity will be incremented.
+ *     tags: [Carts]
  *     requestBody:
  *       required: true
  *       content:
@@ -48,6 +38,8 @@
  *     responses:
  *       201:
  *         description: Item added to cart
+ *       404:
+ *         description: Product not found
  *       500:
  *         description: Error adding item to cart
  */
@@ -57,12 +49,8 @@
  * /cart/items/{id}:
  *   put:
  *     summary: Update cart item quantity
- *     description: >
- *       Update the quantity of a specific item in the cart.  
- *       Requires a valid JWT token with USER role.
- *     tags: [Cart]
- *     security:
- *       - bearerAuth: []
+ *     description: Update the quantity of a specific item in the cart.
+ *     tags: [Carts]
  *     parameters:
  *       - in: path
  *         name: id
@@ -85,6 +73,8 @@
  *     responses:
  *       200:
  *         description: Cart item updated
+ *       404:
+ *         description: Item not found
  *       500:
  *         description: Error updating cart item
  */
@@ -94,12 +84,8 @@
  * /cart/items/{id}:
  *   delete:
  *     summary: Delete cart item
- *     description: >
- *       Remove an item from the cart by its ID.  
- *       Requires a valid JWT token with USER role.
- *     tags: [Cart]
- *     security:
- *       - bearerAuth: []
+ *     description: Remove an item from the cart by its ID.
+ *     tags: [Carts]
  *     parameters:
  *       - in: path
  *         name: id
@@ -110,6 +96,8 @@
  *     responses:
  *       200:
  *         description: Cart item deleted
+ *       404:
+ *         description: Item not found
  *       500:
  *         description: Error deleting cart item
  */

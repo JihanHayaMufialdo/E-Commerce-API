@@ -1,12 +1,12 @@
 const { PrismaClient, Prisma } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// GET all orders
 const getAllOrders = async (req, res) => {
     try {
   
       const orders = await prisma.order.findMany({
         select: {
+            id: true,
             orderDate: true,
             user: {
                 select: {
@@ -24,13 +24,12 @@ const getAllOrders = async (req, res) => {
         orderDate: o.orderDate.toISOString().split('T')[0]
       }));
   
-      res.json(formatted);
+      res.json({message: "Request success", formatted});
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
 };
 
-// Get user order
 const getUserOrders = async (req, res) => {
     try {
       const { userId } = req.params
@@ -40,6 +39,7 @@ const getUserOrders = async (req, res) => {
           userId
         },
         select: {
+            id: true,
             orderDate: true,
             orderAmount: true,
             orderStatus: true,
@@ -51,13 +51,12 @@ const getUserOrders = async (req, res) => {
         orderDate: o.orderDate.toISOString().split('T')[0]
       }));
   
-      res.json(formatted);
+      res.json({message: "Request success", formatted});
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
 };
 
-// Get user order items
 const getUserOrderItems = async (req, res) => {
     try {
       const { userId, orderId } = req.params;
@@ -71,14 +70,16 @@ const getUserOrderItems = async (req, res) => {
       });
   
       if (!order) {
-        return res.status(403).json({ error: "Unauthorized: Order does not belong to this user" });
+        return res.status(403).json({ error: "Unauthorized: Order does not belong to user" });
       }
   
       const orderItems = await prisma.orderItem.findMany({
         where: { orderId },
         select: {
+          id: true,
           product: {
             select: {
+              id: true,
               productName: true,
               productPrice: true,
             }
@@ -87,18 +88,16 @@ const getUserOrderItems = async (req, res) => {
         }
       });
   
-      res.json(orderItems);
+      res.json({message: "Request success", orderItems});
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   };  
 
-// Update order status
 const updateUserOrderStatus = async (req, res) => {
     const { userId, orderId } = req.params;
   
     try {
-      // Check if order belongs to the user
       const order = await prisma.order.findFirst({
         where: {
           id: orderId,
@@ -111,7 +110,7 @@ const updateUserOrderStatus = async (req, res) => {
       }
   
       if (order.orderStatus !== "PAID") {
-        return res.status(400).json({ error: "Order can only SHIPPED if order status is PAID" });
+        return res.status(400).json({ error: "Order not eligible for shipping (not PAID)" });
       }
   
       const updated = await prisma.order.update({
@@ -124,11 +123,6 @@ const updateUserOrderStatus = async (req, res) => {
   
       res.json({message: "Order status updated", updated});
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientValidationError) {
-        return res.status(400).json({
-          error: "Invalid value for orderStatus, Order cannot be cancelled"
-        });
-      }
       res.status(500).json({ error: error.message });
     }
 };  

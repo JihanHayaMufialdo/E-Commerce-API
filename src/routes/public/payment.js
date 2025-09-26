@@ -4,12 +4,8 @@
  *   post:
  *     summary: Create payment transaction
  *     description: >
- *       Create a Midtrans Snap payment for an existing order.  
- *       Returns Midtrans `token` and `redirect_url` to complete the payment.
- *       Requires a valid Json Web Token (JWT) with USER role.
+ *       Returns a payment `token` and `redirect_url` for testing.
  *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -24,8 +20,8 @@
  *           application/json:
  *             example:
  *               message: "Payment token created"
- *               redirect_url: "https://app.sandbox.midtrans.com/snap/v2/vtweb/..."
- *               token: "abcd1234xyz"
+ *               redirect_url: "https://app.sandbox.midtrans.com/snap/v2/vtweb/mock-payment-url"
+ *               token: "mock-token-12345"
  *       400:
  *         description: Order must be pending
  *       404:

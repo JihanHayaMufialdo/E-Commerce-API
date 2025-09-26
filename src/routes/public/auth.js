@@ -3,9 +3,8 @@
  * /register:
  *   post:
  *     summary: User register
- *     description: 
- *       This endpoint allows a new user to create an account. 
- *       The email must be unique. Passwords will be hashed before storing in the database.
+ *     description: >
+ *       This endpoint simulates user registration.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -25,21 +24,16 @@
  *                 example: password123
  *     responses:
  *       201:
- *         description: User registered, please login
- *       400:
- *         description: Email already registered
- *       500:
- *         description: Internal server error
+ *         description: User registered
  */
 
 /**
  * @swagger
  * /login:
  *   post:
- *     summary: User login, try this out to get the token for USER authorize
- *     description: 
- *       This endpoint allows an existing user to login by providing email and password.
- *       On successful login, a JSON Web Token (JWT) will be returned for authentication.
+ *     summary: User login
+ *     description: >
+ *       This endpoint simulates user login. It returns a fake JWT token for testing.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -64,20 +58,15 @@
  *               properties:
  *                 token:
  *                   type: string
- *       400:
- *         description: Email not found or password incorrect)
- *       500:
- *         description: Internal server error
  */
 
 /**
  * @swagger
  * /admin/login:
  *   post:
- *     summary: Admin login, try this out to get the token for ADMIN authorize
- *     description: 
- *       This endpoint allows an admin to login by providing email and password.
- *       On successful login, a JSON Web Token (JWT) will be returned for authentication.
+ *     summary: Admin login
+ *     description: >
+ *       This endpoint simulates admin login. It returns a fake JWT token for testing.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -102,8 +91,4 @@
  *               properties:
  *                 token:
  *                   type: string
- *       400:
- *         description: Email not found or password incorrect)
- *       500:
- *         description: Internal server error
  */

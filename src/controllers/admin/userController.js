@@ -5,13 +5,14 @@ const getUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
       select: {
+        id: true,
         userName: true,
         userEmail: true,
         userRole: true,
         createdAt: true,
       },
     });
-    res.json(users);
+    res.json({message: "Request success", users});
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

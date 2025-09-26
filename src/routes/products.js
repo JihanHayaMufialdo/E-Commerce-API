@@ -8,7 +8,25 @@
  *     tags: [Products]
  *     responses:
  *       200:
- *         description: Successfully retrieved products
+ *         description: Request success
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /admin/products:
+ *   get:
+ *     summary: Retrieve all products detail
+ *     description:
+ *       Fetches a list of all products available.
+ *       Requires a valid Json Web Token (JWT) with ADMIN role.
+ *     tags: [Admin-Products]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Request success
  *       500:
  *         description: Internal server error
  */
@@ -19,9 +37,8 @@
  *   post:
  *     summary: Create a new product
  *     description: |
- *       Retrieve all products. This endpoint requires admin role.
- *       To access, provide a valid JWT token in the Authorization header. 
- *       Use the "Authorize" button and enter: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImVhMGZhNTdjLTliZmYtNGM4MC1iOGQyLWE1ZTVjNmQwYzAwZSIsInVzZXJSb2xlIjoiQURNSU4iLCJpYXQiOjE3NTg2OTczNTIsImV4cCI6MTc1ODc4Mzc1Mn0._vC2uFIik9hw8p_OKyAb61sSZ0iucP_HMK23aryAuCc to authenticate.
+ *       Create a new product. This endpoint requires admin role.
+ *       Requires a valid Json Web Token (JWT) with ADMIN role.
  *     tags: [Admin-Products]
  *     security:
  *       - bearerAuth: []
@@ -50,7 +67,7 @@
  *                 example: 15
  *     responses:
  *       201:
- *         description: Product successfully created
+ *         description: Product created
  *       400:
  *         description: Invalid input data
  *       401:
@@ -58,6 +75,7 @@
  *       500:
  *         description: Internal server error
  */
+
 /**
  * @swagger
  * /admin/products/{id}:
@@ -65,7 +83,7 @@
  *     summary: Update a product by ID
  *     description: >
  *       Allows an admin to update an existing product's name, price, or stock.
- *       Requires a valid JWT token for admin authorization.
+ *       Requires a valid Json Web Token (JWT) with ADMIN role.
  *     tags: [Admin-Products]
  *     security:
  *       - bearerAuth: []
@@ -100,6 +118,8 @@
  *         description: Product updated
  *       400:
  *         description: Invalid input or product not found
+ *       401:
+ *         description: Unauthorized, token missing or invalid
  *       500:
  *         description: Internal server error
  */
@@ -111,7 +131,7 @@
  *     summary: Delete a product by ID
  *     description: >
  *       Allows an admin to delete an existing product by providing its ID.
- *       Requires a valid JWT token for admin authorization.
+ *       Requires a valid Json Web Token (JWT) with ADMIN role.
  *     tags: [Admin-Products]
  *     security:
  *       - bearerAuth: []
@@ -127,6 +147,8 @@
  *         description: Product deleted
  *       400:
  *         description: Invalid product ID or product not found
+ *       401:
+ *         description: Unauthorized, token missing or invalid
  *       500:
  *         description: Internal server error
  */

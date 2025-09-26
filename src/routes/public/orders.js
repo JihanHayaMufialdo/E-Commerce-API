@@ -5,10 +5,7 @@
  *     summary: Get active orders
  *     description: >
  *       Retrieve all active orders of the logged-in user.
- *       Requires a valid JWT token with USER role.
  *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: List of active orders
@@ -23,10 +20,7 @@
  *     summary: Get order history
  *     description: >
  *       Retrieve cancelled and delivered orders of the logged-in user.
- *       Requires a valid JWT token with USER role.
  *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: List of historical orders
@@ -42,10 +36,7 @@
  *     description: >
  *       Create an order from items in the user's cart or request body.  
  *       This endpoint will check stock availability, calculate total amount, and update product stock.  
- *       Requires a valid JWT token with USER role.
  *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -71,9 +62,9 @@
  *                       example: 2
  *     responses:
  *       201:
- *         description: Order successfully created
+ *         description: Order created
  *       400:
- *         description: Not enough stock or invalid request
+ *         description: Not enough stock
  *       404:
  *         description: Product not found
  *       500:
@@ -87,16 +78,13 @@
  *     summary: Update order status
  *     description: >
  *       Update the order status to DELIVERED when the order is received.
- *       Requires a valid JWT token with USER role.
  *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: ID of the order
  *     responses:
  *       200:
@@ -116,22 +104,19 @@
  *     summary: Cancel order
  *     description: >
  *       Cancel a specific order, only if it is still in PENDING status.  
- *       Requires a valid JWT token with USER role.
  *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: ID of the order
  *     responses:
  *       200:
  *         description: Order cancelled 
  *       400:
- *         Invalid value for orderStatus, Order cannot be cancelled
+ *         description: Invalid value for orderStatus, Order cannot be cancelled
  *       404:
  *         description: Order not found
  *       500:
@@ -144,16 +129,13 @@
  *   get:
  *     summary: Get all orders
  *     description: >
- *       Retrieve all orders and orders history from all users.  
- *       Requires a valid JWT token with ADMIN role.  
+ *       Retrieve all orders and orders history from all users.   
  *     tags: [Admin-Orders]
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: List of all orders
  *       500:
- *         description: Server error
+ *         description: Internal server error
  */
 
 
@@ -164,10 +146,7 @@
  *     summary: Get orders of a user
  *     description: >
  *       Retrieve all orders of a specific user.  
- *       Requires a valid JWT token with ADMIN role.
  *     tags: [Admin-Orders]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -177,11 +156,10 @@
  *         description: ID of the user
  *     responses:
  *       200:
- *         description: List of orders from the user
+ *         description: Request success
  *       500:
  *         description: Server error
  */
-
 
 /**
  * @swagger
@@ -190,10 +168,7 @@
  *     summary: Get order items of a user
  *     description: >
  *       Retrieve all items of a specific order belonging to a user.
- *       Requires a valid JWT token with ADMIN role.
  *     tags: [Admin-Orders]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -209,9 +184,9 @@
  *         description: ID of the order
  *     responses:
  *       200:
- *         description: List of order items
+ *         description: Request success
  *       403:
- *         description: Unauthorized access (order does not belong to user)
+ *         description: Unauthorized, Order does not belong to user
  *       500:
  *         description: Server error
  */
@@ -225,10 +200,7 @@
  *     description: >
  *       Update an order's status to SHIPPED,  
  *       but only if the order currently has status PAID.  
- *       Requires a valid JWT token with ADMIN role.
  *     tags: [Admin-Orders]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
